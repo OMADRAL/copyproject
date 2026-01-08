@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouveau Signalement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-plus-circle me-2"></i>Nouveau Signalement</h1>
+        <div>
+            <span class="badge bg-primary">
+                <i class="bi bi-person me-1"></i>
+                <span th:text="${currentUser.name}"></span>
+            </span>
+            <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${param.error}" class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>Veuillez remplir tous les champs obligatoires.
+    </div>
+
+    <form th:action="@{/user/addSignalement}" method="post" id="signalementForm">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">
+                                <i class="bi bi-chat-text me-2"></i>Description du problème *
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                      placeholder="Décrivez la situation (type de déchets, quantité, danger...)"
+                                      required></textarea>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ex: "Déchets plastiques accumulés près de l'école"
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="localisation" class="form-label fw-bold">
+                                <i class="bi bi-geo-alt me-2"></i>Localisation exacte *
+                            </label>
+                            <input type="text" class="form-control" id="localisation" name="localisation"
+                                   placeholder="Ex: Rue Mohammed V, Casablanca" required>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Soyez le plus précis possible pour faciliter l'intervention
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-image me-2"></i>Ajouter une photo
+                            </label>
+                            <div class="border border-dashed rounded p-4 text-center"
+                                 id="dropZone"
+                                 style="cursor: pointer; border-style: dashed !important;">
+                                <i class="bi bi-cloud-arrow-up display-6 text-muted mb-3"></i>
+                                <h6>Glissez-déposez votre photo ici</h6>
+                                <p class="text-muted small">ou cliquez pour sélectionner un fichier</p>
+                                <div class="file-info small" id="fileInfo"></div>
+                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                <img id="preview" class="img-thumbnail mt-3" style="display: none; max-width: 100%;" alt="Aperçu">
+                            </div>
+                            <input type="hidden" id="photo" name="photo">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Formats acceptés: JPG, PNG, GIF (max 1MB)
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="photoUrl" class="form-label">
+                                <i class="bi bi-link me-2"></i>Ou par URL (optionnel)
+                            </label>
+                            <input type="url" class="form-control" id="photoUrl"
+                                   placeholder="https://example.com/photo.jpg">
+                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2 w-100" onclick="useUrl()">
+                                <i class="bi bi-check-lg me-1"></i>Utiliser cette URL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-secondary me-md-2">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-lg me-1"></i>Signaler le problème
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Le script JavaScript reste identique au précédent
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const photoInput = document.getElementById('photo');
+    const photoUrlInput = document.getElementById('photoUrl');
+    const fileInfo = document.getElementById('fileInfo');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-primary'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-primary'));
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('border-primary');
+        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Veuillez sélectionner une image valide (JPG, PNG, GIF)'); return;
+        }
+        if (file.size > 1 * 1024 * 1024) {
+            alert('L\'image est trop volumineuse (max 1MB). Veuillez réduire sa taille.'); return;
+        }
+        fileInfo.innerHTML = `<i class="bi bi-file-earmark-image me-1"></i>${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        fileInfo.className = 'file-info small text-success';
+        const reader = new FileReader();
+        reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; reduceImageQuality(file, 0.7); };
+        reader.readAsDataURL(file);
+    }
+
+    function reduceImageQuality(file, quality) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            let width = img.width, height = img.height, maxWidth = 800, maxHeight = 600;
+            if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
+            if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
+            canvas.width = width; canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            const reducedBase64 = canvas.toDataURL('image/jpeg', quality);
+            photoInput.value = reducedBase64;
+            preview.src = reducedBase64; preview.style.display = 'block';
+            dropZone.querySelector('h6').textContent = 'Photo optimisée';
+            dropZone.querySelector('p').textContent = 'Cliquez pour changer';
+        };
+        img.src = URL.createObjectURL(file);
+    }
+
+    function useUrl() {
+        const url = photoUrlInput.value.trim();
+        if (url) {
+            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i) !== null) {
+                photoInput.value = url; preview.src = url; preview.style.display = 'block';
+                dropZone.querySelector('h6').textContent = 'Photo par URL';
+                dropZone.querySelector('p').textContent = 'URL utilisée avec succès';
+                fileInfo.innerHTML = `<i class="bi bi-link me-1"></i>URL: ${url}`;
+                fileInfo.className = 'file-info small text-success';
+                alert('URL de photo ajoutée avec succès !');
+            } else alert('Veuillez entrer une URL d\'image valide (jpg, png, gif, webp)');
+        } else alert('Veuillez entrer une URL');
+    }
+
+    document.getElementById('signalementForm').addEventListener('submit', function(e) {
+        const description = document.getElementById('description').value.trim();
+        const localisation = document.getElementById('localisation').value.trim();
+        if (!description || !localisation) {
+            e.preventDefault(); alert('Veuillez remplir tous les champs obligatoires (description et localisation)'); return;
+        }
+        const photoData = photoInput.value;
+        if (photoData && photoData.startsWith('data:image') && photoData.length > 500000) {
+            e.preventDefault(); alert('L\'image est encore trop volumineuse après compression. Veuillez utiliser une image plus petite ou une URL.'); return;
+        }
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Envoi en cours...';
+        submitBtn.disabled = true;
+    });
+</script>
+</body>
+</html>
