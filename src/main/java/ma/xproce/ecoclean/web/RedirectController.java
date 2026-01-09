@@ -16,6 +16,9 @@ public class RedirectController {
     @GetMapping("/redirectByRole")
     public String redirectByRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
         String email = auth.getName();
 
         User user = userRepository.findByEmail(email).orElse(null);

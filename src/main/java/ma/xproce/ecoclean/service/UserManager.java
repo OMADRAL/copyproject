@@ -1,5 +1,4 @@
 package ma.xproce.ecoclean.service;
-
 import ma.xproce.ecoclean.dao.entities.User;
 import ma.xproce.ecoclean.dao.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -37,5 +36,10 @@ public class UserManager implements UserService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

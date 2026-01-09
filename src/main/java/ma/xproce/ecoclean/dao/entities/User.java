@@ -18,8 +18,8 @@ public class User {
     private String name;
     private String email;
 
-    @Column(nullable = false) // NOUVEAU
-    private String password; // NOUVEAU - stockera le mot de passe crypté
+    @Column(nullable = false)
+    private String password;
 
     private String role; // "USER" ou "ADMIN"
 

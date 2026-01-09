@@ -1,5 +1,4 @@
 package ma.xproce.ecoclean.web;
-
 import ma.xproce.ecoclean.dao.entities.Signalement;
 import ma.xproce.ecoclean.dao.entities.User;
 import ma.xproce.ecoclean.dao.repositories.UserRepository;
@@ -30,35 +29,31 @@ public class SignalementController {
     @Autowired
     private UserRepository userRepository;
 
-    // PAGE USER - Liste des signalements AVEC PAGINATION
     @GetMapping("/user/dashboard")
     public String userDashboard(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        // Récupérer l'utilisateur connecté via Spring Security
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         User currentUser = userRepository.findByEmail(email).orElse(null);
 
         if (currentUser == null || !"USER".equals(currentUser.getRole())) {
-            return "error";
+            return "redirect:/login";
         }
 
-        // Configuration de la pagination
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Signalement> userSignalements = signalementService.getUserSignalements(currentUser.getId(), pageable);
 
-        // CORRECTION ICI : Changez "signalements" en "listsignalements"
-        model.addAttribute("listsignalements", userSignalements.getContent()); // <-- CHANGÉ
+
+        model.addAttribute("listsignalements", userSignalements.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userSignalements.getTotalPages());
         model.addAttribute("currentUser", currentUser);
         return "userDashboard";
     }
 
-    // PAGE ADMIN - Liste de TOUS les signalements AVEC PAGINATION
     @GetMapping("/admin/dashboard")
     public String adminDashboard(
             @RequestParam(defaultValue = "0") int page,
@@ -70,21 +65,19 @@ public class SignalementController {
         User currentAdmin = userRepository.findByEmail(email).orElse(null);
 
         if (currentAdmin == null || !"ADMIN".equals(currentAdmin.getRole())) {
-            return "error";
+            return "redirect:/login";
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Signalement> signalements = signalementService.getAllSignalements(pageable);
 
-        // CORRECTION ICI : Changez "signalements" en "listsignalements"
-        model.addAttribute("listsignalements", signalements.getContent()); // <-- CHANGÉ
+        model.addAttribute("listsignalements", signalements.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", signalements.getTotalPages());
         model.addAttribute("currentAdmin", currentAdmin);
         return "adminDashboard";
     }
 
-    // CÔTÉ USER Formulaire d'ajout de signalement
     @GetMapping("/user/addSignalement")
     public String showUserAddForm(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -100,7 +93,6 @@ public class SignalementController {
         return "userAddSignalement";
     }
 
-    // CÔTÉ USER Ajouter un signalement AVEC VALIDATION
     @PostMapping("/user/addSignalement")
     public String addUserSignalement(
             @Valid @ModelAttribute("signalement") Signalement signalement,
@@ -115,7 +107,6 @@ public class SignalementController {
             return "error";
         }
 
-        // Traitement de la photo
         String processedPhoto = photo;
         if (photo != null && photo.startsWith("data:image") && photo.length() > 500000) {
             processedPhoto = null;
@@ -129,7 +120,6 @@ public class SignalementController {
         return "redirect:/user/dashboard";
     }
 
-    // CÔTÉ USER - Supprimer un signalement
     @GetMapping("/user/deleteSignalement")
     public String userDeleteSignalement(@RequestParam Long signalementId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -149,7 +139,6 @@ public class SignalementController {
         return "redirect:/user/dashboard";
     }
 
-    // CÔTÉ ADMIN - Modifier le statut
     @GetMapping("/admin/editSignalement")
     public String adminEditSignalement(@RequestParam(name = "signalementId") Long signalementId, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -166,11 +155,10 @@ public class SignalementController {
             model.addAttribute("currentAdmin", currentAdmin);
             return "adminUpdateSignalement";
         } else {
-            return "error";
+            return "redirect:/admin/dashboard";
         }
     }
 
-    // CÔTÉ ADMIN - Mettre à jour le statut
     @PostMapping("/admin/updateSignalement")
     public String adminUpdateSignalement(
             @RequestParam(name = "signalementId") Long signalementId,
@@ -190,11 +178,10 @@ public class SignalementController {
             signalementService.updateSignalement(signalement);
             return "redirect:/admin/dashboard";
         } else {
-            return "error";
+            return "redirect:/admin/dashboard";
         }
     }
 
-    // CÔTÉ ADMIN - Supprimer un signalement
     @GetMapping("/admin/deleteSignalement")
     public String adminDeleteSignalement(@RequestParam Long signalementId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

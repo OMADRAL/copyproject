@@ -1,141 +1,289 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Nouveau Signalement</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoClean - Nouveau Signalement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root {
+            --eco-green: #198754;
+            --eco-light: #e8f5e9;
+            --bg-gray: #f8f9fc;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-gray);
+            color: #4e73df;
+        }
+
+        .navbar-custom {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .main-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #344767;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 2px solid #f0f2f5;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--eco-green);
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.1);
+        }
+
+
+        #dropZone {
+            border: 2px dashed #d1d5db !important;
+            background-color: #fafbfc;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dropZone:hover {
+            border-color: var(--eco-green) !important;
+            background-color: var(--eco-light);
+        }
+
+        .dropzone-active {
+            border-color: var(--eco-green) !important;
+            background-color: var(--eco-light) !important;
+        }
+
+        #preview {
+            border-radius: 15px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+
+        .btn-success {
+            background: var(--eco-green);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(25, 135, 84, 0.3);
+            background: #157347;
+        }
+
+        .btn-outline-secondary {
+            border-radius: 12px;
+            padding: 12px 20px;
+        }
+
+        .step-indicator {
+            width: 30px;
+            height: 30px;
+            background: var(--eco-green);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+
+        .url-box {
+            background: #f1f3f9;
+            border-radius: 15px;
+            padding: 15px;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-plus-circle me-2"></i>Nouveau Signalement</h1>
+
+<nav class="navbar-custom d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <div class="bg-success text-white rounded-3 p-2 me-3 shadow-sm">
+            <i class="bi bi- megaphone fs-4"></i>
+        </div>
         <div>
-            <span class="badge bg-primary">
-                <i class="bi bi-person me-1"></i>
-                <span th:text="${currentUser.name}"></span>
-            </span>
-            <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-outline-secondary ms-2">
-                <i class="bi bi-arrow-left me-1"></i>Retour
-            </a>
+            <h4 class="mb-0 fw-bold text-dark">EcoClean</h4>
+            <small class="text-muted">Nouvelle intervention</small>
         </div>
     </div>
+    <div class="d-flex align-items-center">
+        <span class="badge bg-light text-dark border p-2 px-3 rounded-pill me-3">
+            <i class="bi bi-person-fill text-success me-2"></i>
+            <span th:text="${currentUser.name}">Citoyen</span>
+        </span>
+        <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-sm btn-outline-secondary rounded-pill">
+            <i class="bi bi-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+</nav>
 
-    <div th:if="${param.error}" class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle me-2"></i>Veuillez remplir tous les champs obligatoires.
+<div class="container pb-5">
+
+    <div th:if="${param.error}" class="alert alert-danger border-0 shadow-sm animate__animated animate__shakeX">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>Veuillez remplir tous les champs obligatoires avant de soumettre.
     </div>
 
-    <form th:action="@{/user/addSignalement}" method="post" id="signalementForm">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="description" class="form-label fw-bold">
-                                <i class="bi bi-chat-text me-2"></i>Description du problème *
+    <form th:action="@{/user/addSignalement}" method="post" id="signalementForm" class="animate__animated animate__fadeInUp">
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+                <div class="card main-card h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4 text-dark">
+                            <span class="step-indicator shadow-sm">1</span> Détails de l'incident
+                        </h5>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label">
+                                <i class="bi bi-chat-right-text me-2 text-success"></i>Description du problème *
                             </label>
-                            <textarea class="form-control" id="description" name="description" rows="4"
-                                      placeholder="Décrivez la situation (type de déchets, quantité, danger...)"
+                            <textarea class="form-control" id="description" name="description" rows="5"
+                                      placeholder="Ex: Accumulation de gravats sur le trottoir depuis 3 jours..."
                                       required></textarea>
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Ex: "Déchets plastiques accumulés près de l'école"
+                            <div class="form-text mt-2">
+                                <i class="bi bi-lightbulb me-1"></i> Donnez un maximum de détails pour nous aider.
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="localisation" class="form-label fw-bold">
-                                <i class="bi bi-geo-alt me-2"></i>Localisation exacte *
+                            <label for="localisation" class="form-label">
+                                <i class="bi bi-geo-alt-fill me-2 text-danger"></i>Localisation précise *
                             </label>
-                            <input type="text" class="form-control" id="localisation" name="localisation"
-                                   placeholder="Ex: Rue Mohammed V, Casablanca" required>
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Soyez le plus précis possible pour faciliter l'intervention
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0" id="localisation" name="localisation"
+                                       placeholder="Ex: 12 Rue des Lilas, Quartier Maârif, Casablanca" required>
+                            </div>
+                            <div class="form-text mt-2">
+                                <i class="bi bi-info-circle me-1"></i> Utilisez l'adresse complète ou un point de repère.
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="bi bi-image me-2"></i>Ajouter une photo
-                            </label>
-                            <div class="border border-dashed rounded p-4 text-center"
-                                 id="dropZone"
-                                 style="cursor: pointer; border-style: dashed !important;">
-                                <i class="bi bi-cloud-arrow-up display-6 text-muted mb-3"></i>
-                                <h6>Glissez-déposez votre photo ici</h6>
-                                <p class="text-muted small">ou cliquez pour sélectionner un fichier</p>
-                                <div class="file-info small" id="fileInfo"></div>
-                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                                <img id="preview" class="img-thumbnail mt-3" style="display: none; max-width: 100%;" alt="Aperçu">
+            <div class="col-lg-4">
+                <div class="card main-card mb-4">
+                    <div class="card-body p-4 text-center">
+                        <h5 class="fw-bold mb-4 text-dark text-start">
+                            <span class="step-indicator shadow-sm">2</span> Preuve Visuelle
+                        </h5>
+
+                        <div id="dropZone" class="p-4 py-5 text-center mb-3">
+                            <div id="dropZoneContent">
+                                <i class="bi bi-cloud-arrow-up-fill display-4 text-success mb-3"></i>
+                                <h6 class="fw-bold text-dark">Prendre / Choisir une photo</h6>
+                                <p class="text-muted small">JPG, PNG (Max 1MB)</p>
                             </div>
-                            <input type="hidden" id="photo" name="photo">
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Formats acceptés: JPG, PNG, GIF (max 1MB)
-                            </div>
+
+                            <img id="preview" class="img-fluid" style="display: none;" alt="Aperçu">
+
+                            <div id="fileInfo" class="mt-2 small fw-bold"></div>
+                            <input type="file" id="fileInput" accept="image/*" style="display: none;">
                         </div>
 
-                        <div class="mb-3">
-                            <label for="photoUrl" class="form-label">
-                                <i class="bi bi-link me-2"></i>Ou par URL (optionnel)
+                        <input type="hidden" id="photo" name="photo">
+
+                        <div class="url-box text-start mt-4">
+                            <label for="photoUrl" class="form-label small">
+                                <i class="bi bi-link-45deg me-1"></i>Ou via une URL d'image
                             </label>
-                            <input type="url" class="form-control" id="photoUrl"
-                                   placeholder="https://example.com/photo.jpg">
-                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2 w-100" onclick="useUrl()">
-                                <i class="bi bi-check-lg me-1"></i>Utiliser cette URL
-                            </button>
+                            <div class="input-group input-group-sm">
+                                <input type="url" class="form-control" id="photoUrl" placeholder="https://...">
+                                <button type="button" class="btn btn-secondary" onclick="useUrl()">Ok</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-            <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-secondary me-md-2">
-                <i class="bi bi-x-circle me-1"></i>Annuler
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-check-lg me-1"></i>Signaler le problème
-            </button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success py-3 shadow">
+                        <i class="bi bi-send-check-fill me-2"></i>Envoyer le Signalement
+                    </button>
+                    <a th:href="@{/user/dashboard(userId=${currentUser.id})}" class="btn btn-link text-muted text-decoration-none">
+                        <i class="bi bi-x"></i> Annuler l'opération
+                    </a>
+                </div>
+            </div>
         </div>
     </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Le script JavaScript reste identique au précédent
+
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
     const photoInput = document.getElementById('photo');
     const photoUrlInput = document.getElementById('photoUrl');
     const fileInfo = document.getElementById('fileInfo');
+    const dropZoneContent = document.getElementById('dropZoneContent');
 
     dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-primary'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-primary'));
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('border-primary');
-        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dropzone-active');
+    });
+
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dropzone-active'));
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dropzone-active');
+        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
 
     function handleFile(file) {
         if (!file.type.startsWith('image/')) {
-            alert('Veuillez sélectionner une image valide (JPG, PNG, GIF)'); return;
+            alert('Veuillez sélectionner une image valide'); return;
         }
         if (file.size > 1 * 1024 * 1024) {
-            alert('L\'image est trop volumineuse (max 1MB). Veuillez réduire sa taille.'); return;
+            alert('L\'image est trop volumineuse (max 1MB)'); return;
         }
-        fileInfo.innerHTML = `<i class="bi bi-file-earmark-image me-1"></i>${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        fileInfo.className = 'file-info small text-success';
+
+        fileInfo.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i> ${file.name}`;
+        dropZoneContent.style.display = 'none';
+
         const reader = new FileReader();
-        reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; reduceImageQuality(file, 0.7); };
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            reduceImageQuality(file, 0.7);
+        };
         reader.readAsDataURL(file);
     }
 
@@ -151,9 +299,6 @@
             ctx.drawImage(img, 0, 0, width, height);
             const reducedBase64 = canvas.toDataURL('image/jpeg', quality);
             photoInput.value = reducedBase64;
-            preview.src = reducedBase64; preview.style.display = 'block';
-            dropZone.querySelector('h6').textContent = 'Photo optimisée';
-            dropZone.querySelector('p').textContent = 'Cliquez pour changer';
         };
         img.src = URL.createObjectURL(file);
     }
@@ -161,29 +306,17 @@
     function useUrl() {
         const url = photoUrlInput.value.trim();
         if (url) {
-            if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i) !== null) {
-                photoInput.value = url; preview.src = url; preview.style.display = 'block';
-                dropZone.querySelector('h6').textContent = 'Photo par URL';
-                dropZone.querySelector('p').textContent = 'URL utilisée avec succès';
-                fileInfo.innerHTML = `<i class="bi bi-link me-1"></i>URL: ${url}`;
-                fileInfo.className = 'file-info small text-success';
-                alert('URL de photo ajoutée avec succès !');
-            } else alert('Veuillez entrer une URL d\'image valide (jpg, png, gif, webp)');
-        } else alert('Veuillez entrer une URL');
+            photoInput.value = url;
+            preview.src = url;
+            preview.style.display = 'block';
+            dropZoneContent.style.display = 'none';
+            fileInfo.innerHTML = `<i class="bi bi-link-45deg text-primary me-1"></i> Image via URL`;
+        }
     }
 
     document.getElementById('signalementForm').addEventListener('submit', function(e) {
-        const description = document.getElementById('description').value.trim();
-        const localisation = document.getElementById('localisation').value.trim();
-        if (!description || !localisation) {
-            e.preventDefault(); alert('Veuillez remplir tous les champs obligatoires (description et localisation)'); return;
-        }
-        const photoData = photoInput.value;
-        if (photoData && photoData.startsWith('data:image') && photoData.length > 500000) {
-            e.preventDefault(); alert('L\'image est encore trop volumineuse après compression. Veuillez utiliser une image plus petite ou une URL.'); return;
-        }
         const submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Envoi en cours...';
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Envoi...';
         submitBtn.disabled = true;
     });
 </script>

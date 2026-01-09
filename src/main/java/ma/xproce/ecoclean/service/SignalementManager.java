@@ -20,13 +20,11 @@ public class SignalementManager implements SignalementService {
         return signalementRepository.findAll();
     }
 
-    // NOUVEAU : Pagination pour tous les signalements
     @Override
     public Page<Signalement> getAllSignalements(Pageable pageable) {
         return signalementRepository.findAll(pageable);
     }
 
-    // NOUVEAU : Pagination pour les signalements d'un utilisateur
     @Override
     public Page<Signalement> getUserSignalements(Long userId, Pageable pageable) {
         return signalementRepository.findByUserId(userId, pageable);

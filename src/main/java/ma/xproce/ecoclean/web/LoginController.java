@@ -7,6 +7,6 @@ public class LoginController {
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "login"; // Retourne la vue login.html
+        return "login";
     }
 }

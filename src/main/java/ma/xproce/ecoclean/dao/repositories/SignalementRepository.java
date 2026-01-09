@@ -6,6 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SignalementRepository extends JpaRepository<Signalement, Long> {
-    // NOUVEAU : Méthode pour la pagination par utilisateur
     Page<Signalement> findByUserId(Long userId, Pageable pageable);
 }

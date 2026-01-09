@@ -19,21 +19,21 @@ public class SecurityConfiguration {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/webjars/**").permitAll()
+                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")  // La même URL que dans th:action
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/redirectByRole", true)
-                        .failureUrl("/login?error=true")  // Ajoute ?error en cas d'échec
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")  // Ajoute ?logout après déconnexion
+                        .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 );
 

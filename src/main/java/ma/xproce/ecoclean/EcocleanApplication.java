@@ -19,7 +19,6 @@ public class EcocleanApplication {
     @Bean
     CommandLineRunner start(UserService userService, SignalementService signalementService, PasswordEncoder passwordEncoder) {
         return args -> {
-            // utilisateurs avec rôles ET MOTS DE PASSE CRYPTÉS
             User user1 = new User(null, "Ahmed", "ahmed@gmail.com",
                     passwordEncoder.encode("motdepasse"), "USER", null);
             User user2 = new User(null, "Fatima", "fatima@gmail.com",
@@ -37,7 +36,6 @@ public class EcocleanApplication {
             System.out.println("Admin: admin@ecoclean.ma / motdepasse");
             System.out.println("=======================");
 
-            // signalements
             Signalement s1 = new Signalement(null, "Déchets plastiques dans la rue principale",
                     "Rue Mohammed V, Casablanca", null, "SIGNALE", user1);
             Signalement s2 = new Signalement(null, "Poubelle publique pleine",

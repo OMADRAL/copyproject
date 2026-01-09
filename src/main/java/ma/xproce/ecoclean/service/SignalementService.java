@@ -10,8 +10,6 @@ public interface SignalementService {
     boolean deleteSignalement(Long id);
     Signalement getSignalementById(Long id);
     List<Signalement> getAllSignalements();
-
-    // NOUVEAUX : Méthodes de pagination
     Page<Signalement> getAllSignalements(Pageable pageable);
     Page<Signalement> getUserSignalements(Long userId, Pageable pageable);
 }

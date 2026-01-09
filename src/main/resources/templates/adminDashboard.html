@@ -2,136 +2,326 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Espace Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Signalements</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --dark-bg: #f8f9fc;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+
+        .wrapper { display: flex; width: 100%; align-items: stretch; }
+
+        #sidebar {
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+            color: #fff;
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: fixed;
+            z-index: 1000;
+        }
+
+        #content {
+            width: calc(100% - var(--sidebar-width));
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+            padding: 30px;
+        }
+
+        .sidebar-header { padding: 20px; background: rgba(0,0,0,0.1); text-align: center; }
+        .sidebar-link {
+            padding: 15px 25px;
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left: 4px solid #fff;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .main-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: #f8f9fc;
+            border: none;
+            color: #4e73df;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .table tbody tr:hover {
+            background-color: #f1f4ff !important;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .badge-status {
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .pulse-signale { animation: pulse-yellow 2s infinite; }
+        @keyframes pulse-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+
+        .img-preview {
+            width: 60px; height: 60px;
+            object-fit: cover;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .img-preview:hover { transform: rotate(5deg) scale(1.2); }
+
+        .admin-nav {
+            background: white;
+            border-radius: 50px;
+            padding: 5px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-gear-fill me-2"></i>Espace Administration</h1>
-        <div>
-            <span class="badge bg-success">
-                <i class="bi bi-person-check me-1"></i>
-                <span th:text="${currentAdmin.name}"></span>
-            </span>
-            <a th:href="@{/login}" class="btn btn-outline-secondary ms-2">
-                <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+
+<div class="wrapper">
+
+    <nav id="sidebar" class="animate__animated animate__slideInLeft">
+        <div class="sidebar-header">
+            <h3 class="fw-bold mb-0"><i class="bi bi-shield-check me-2"></i>Admin</h3>
+            <small class="opacity-50">Gestion de la Ville</small>
+        </div>
+
+        <div class="mt-4">
+            <a href="#" class="sidebar-link active">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+            </a>
+
+            <hr class="mx-3 opacity-25">
+            <a th:href="@{/login}" class="sidebar-link text-warning">
+                <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
             </a>
         </div>
-    </div>
+    </nav>
 
-    <div class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>Espace Admin</strong> - Vous pouvez gérer tous les signalements.
-    </div>
 
-    <h3 class="mb-3"><i class="bi bi-list-ul me-2"></i>Tous les Signalements</h3>
+    <div id="content">
+        <div class="d-flex justify-content-between align-items-center mb-5 animate__animated animate__fadeInDown">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Tableau de Bord</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Accueil</a></li>
+                        <li class="breadcrumb-item active">Signalements</li>
+                    </ol>
+                </nav>
+            </div>
 
-    <div th:if="${listsignalements == null or listsignalements.isEmpty()}" class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>Aucun signalement pour le moment.
-    </div>
-
-    <div th:unless="${listsignalements == null or listsignalements.isEmpty()}" class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Photo</th>
-                <th>Description</th>
-                <th>Localisation</th>
-                <th>Statut</th>
-                <th>Signalé par</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="signalement : ${listsignalements}">
-                <td class="fw-bold" th:text="${signalement.id}"></td>
-                <td>
-                    <div th:if="${signalement.photo != null}">
-                        <img th:if="${signalement.photo.startsWith('data:image')}"
-                             th:src="${signalement.photo}"
-                             class="img-thumbnail"
-                             style="max-width: 120px; max-height: 90px; cursor: pointer;"
-                             alt="Photo du signalement"
-                             data-bs-toggle="modal"
-                             data-bs-target="#imageModal"
-                             th:attr="data-bs-image=${signalement.photo}">
-                        <img th:unless="${signalement.photo.startsWith('data:image')}"
-                             th:src="${signalement.photo}"
-                             class="img-thumbnail"
-                             style="max-width: 120px; max-height: 90px; cursor: pointer;"
-                             alt="Photo du signalement"
-                             data-bs-toggle="modal"
-                             data-bs-target="#imageModal"
-                             th:attr="data-bs-image=${signalement.photo}"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="admin-nav d-flex align-items-center">
+                <div class="me-3 text-end">
+                    <div class="fw-bold text-dark small" th:text="${currentAdmin.name}">Admin</div>
+                    <span class="badge bg-success" style="font-size: 0.6rem;">EN LIGNE</span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=4e73df&color=fff" class="rounded-circle" width="40">
+            </div>
+        </div>
+        <div class="row mb-4 animate__animated animate__fadeInUp">
+            <div class="col-md-4">
+                <div class="card stat-card p-3 border-start border-primary border-5">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-primary fw-bold small text-uppercase mb-1">Total Signalements</div>
+                            <h3 class="fw-bold mb-0" th:text="${listsignalements != null ? listsignalements.size() : 0}">0</h3>
+                        </div>
+                        <i class="bi bi-clipboard-data fs-1 text-light"></i>
                     </div>
-                    <div th:unless="${signalement.photo != null}"
-                         class="border rounded d-flex align-items-center justify-content-center text-muted"
-                         style="width: 120px; height: 90px;">
-                        <i class="bi bi-camera me-1"></i>Aucune
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card p-3 border-start border-warning border-5">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-warning fw-bold small text-uppercase mb-1">En attente</div>
+                            <h3 class="fw-bold mb-0">Action requise</h3>
+                        </div>
+                        <i class="bi bi-exclamation-circle fs-1 text-light"></i>
                     </div>
-                </td>
-                <td th:text="${signalement.description}"></td>
-                <td th:text="${signalement.localisation}"></td>
-                <td>
-                        <span th:if="${signalement.statut == 'SIGNALE'}"
-                              class="badge bg-warning text-dark">
-                            <i class="bi bi-exclamation-triangle me-1"></i>Signalé
-                        </span>
-                    <span th:if="${signalement.statut == 'EN_COURS'}"
-                          class="badge bg-info">
-                            <i class="bi bi-arrow-repeat me-1"></i>En cours
-                        </span>
-                    <span th:if="${signalement.statut == 'RESOLU'}"
-                          class="badge bg-success">
-                            <i class="bi bi-check-circle me-1"></i>Résolu
-                        </span>
-                </td>
-                <td>
-                    <i class="bi bi-person me-1"></i>
-                    <span th:text="${signalement.user?.name}"></span>
-                </td>
-                <td>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <!-- Lien pour modifier le statut -->
-                        <a th:href="@{/admin/editSignalement(signalementId=${signalement.id})}"
-                           class="btn btn-outline-primary">
-                            <i class="bi bi-pencil me-1"></i>Statut
-                        </a>
-                        <!-- Lien pour supprimer -->
-                        <a th:href="@{/admin/deleteSignalement(signalementId=${signalement.id})}"
-                           class="btn btn-outline-danger"
-                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce signalement ? Cette action est irréversible.')">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card p-3 border-start border-success border-5">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-success fw-bold small text-uppercase mb-1">Taux de résolution</div>
+                            <h3 class="fw-bold mb-0">94%</h3>
+                        </div>
+                        <i class="bi bi-check2-all fs-1 text-light"></i>
                     </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card main-card animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                <h5 class="fw-bold mb-0"><i class="bi bi-list-ul me-2"></i>Récentes Interventions</h5>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Aperçu</th>
+                            <th>Détails</th>
+                            <th>Localisation</th>
+                            <th>Statut</th>
+                            <th>Auteur</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="signalement : ${listsignalements}">
+                            <td class="ps-4 fw-bold text-muted" th:text="'#' + ${signalement.id}"></td>
+                            <td>
+                                <div th:if="${signalement.photo != null}">
+                                    <img th:src="${signalement.photo}"
+                                         class="img-preview shadow-sm"
+                                         data-bs-toggle="modal" data-bs-target="#imageModal"
+                                         th:attr="data-bs-image=${signalement.photo}"
+                                         onerror="this.src='https://via.placeholder.com/60'">
+                                </div>
+                                <div th:unless="${signalement.photo != null}" class="bg-light rounded text-center py-2" style="width:60px">
+                                    <i class="bi bi-camera text-muted"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-medium text-dark" th:text="${#strings.abbreviate(signalement.description, 40)}"></div>
+                                <small class="text-muted">Publié récemment</small>
+                            </td>
+                            <td>
+                                    <span class="badge bg-light text-dark fw-normal">
+                                        <i class="bi bi-geo-alt text-danger me-1"></i>
+                                        <span th:text="${signalement.localisation}"></span>
+                                    </span>
+                            </td>
+                            <td>
+                                    <span th:if="${signalement.statut == 'SIGNALE'}" class="badge-status bg-warning bg-opacity-10 text-warning pulse-signale">
+                                        <i class="bi bi-dot fs-4"></i> Signalé
+                                    </span>
+                                <span th:if="${signalement.statut == 'EN_COURS'}" class="badge-status bg-info bg-opacity-10 text-info">
+                                        <i class="bi bi-arrow-repeat"></i> En cours
+                                    </span>
+                                <span th:if="${signalement.statut == 'RESOLU'}" class="badge-status bg-success bg-opacity-10 text-success">
+                                        <i class="bi bi-check2"></i> Résolu
+                                    </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2 bg-secondary bg-opacity-10 rounded-circle text-center" style="width:32px; height:32px; line-height:32px">
+                                        <i class="bi bi-person text-secondary"></i>
+                                    </div>
+                                    <span class="small fw-medium" th:text="${signalement.user?.name}">User</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a th:href="@{/admin/editSignalement(signalementId=${signalement.id})}" class="btn btn-outline-primary btn-sm rounded-start">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{/admin/deleteSignalement(signalementId=${signalement.id})}"
+                                       class="btn btn-outline-danger btn-sm rounded-end"
+                                       onclick="return confirm('Supprimer ?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white border-0 py-4" th:if="${totalPages > 1}">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link border-0 shadow-sm rounded-circle mx-1" th:href="@{/admin/dashboard(page=${currentPage - 1}, size=10)}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link border-0 shadow-sm rounded-circle mx-1" th:href="@{/admin/dashboard(page=${i}, size=10)}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link border-0 shadow-sm rounded-circle mx-1" th:href="@{/admin/dashboard(page=${currentPage + 1}, size=10)}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Modal pour agrandir l'image -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">
-                    <i class="bi bi-image me-2"></i>Photo du signalement
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Photo agrandie" class="img-fluid rounded">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i>Fermer
-                </button>
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-body p-0">
+                <img id="modalImage" src="" class="img-fluid w-100" style="border-radius: 20px;">
             </div>
         </div>
     </div>
@@ -139,42 +329,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
     const imageModal = document.getElementById('imageModal');
-    if (imageModal) {
-        imageModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const imageUrl = button.getAttribute('data-bs-image');
-            const modalImage = document.getElementById('modalImage');
-            modalImage.src = imageUrl;
-        });
-    }
+    imageModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const imageUrl = button.getAttribute('data-bs-image');
+        document.getElementById('modalImage').src = imageUrl;
+    });
 </script>
-<!-- À la fin du fichier, avant </body>, ajouter : -->
-<div class="d-flex justify-content-center mt-4" th:if="${totalPages > 1}">
-    <nav aria-label="Pagination">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                <a class="page-link"
-                   th:href="@{/admin/dashboard(page=${currentPage - 1}, size=10)}">
-                    <i class="bi bi-chevron-left"></i> Précédent
-                </a>
-            </li>
-
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                th:classappend="${i == currentPage} ? 'active' : ''">
-                <a class="page-link"
-                   th:href="@{/admin/dashboard(page=${i}, size=10)}"
-                   th:text="${i + 1}"></a>
-            </li>
-
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                <a class="page-link"
-                   th:href="@{/admin/dashboard(page=${currentPage + 1}, size=10)}">
-                    Suivant <i class="bi bi-chevron-right"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>
 </body>
 </html>
